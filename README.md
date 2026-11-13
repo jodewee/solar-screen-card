@@ -22,7 +22,7 @@ Een Home Assistant Lovelace-kaart om solar-screens (en andere rolluiken/screens,
 ### Handmatig
 1. Kopieer `solar-screen-card.js` naar `/config/www/`.
 2. Voeg een resource toe (**Instellingen → Dashboards → ⋮ → Resources**):
-   `/local/solar-screen-card.js?v=2026.11.13.3`, type **JavaScript module**.
+   `/local/solar-screen-card.js?v=2026.11.13.5`, type **JavaScript module**.
 
 ## Configuratie
 
@@ -55,8 +55,10 @@ info_entities:
 | `window_azimuth` | – | Richting waarin het raam kijkt (N=0, O=90, Z=180, W=270) |
 | `window_fov` | `90` | Breedte in graden waarin de zon op het raam staat |
 | `info_entities` | – | Lijst met extra sensoren (string of `{entity, name, icon}`) |
-| `window_color` | – | Effen kleur achter het glas i.p.v. de blauwe lucht: `[r, g, b]` of CSS-kleur |
-| `window_image` | – | Foto achter het glas (bv. je echte uitzicht): upload via de editor, of `/local/tuin.jpg` |
+| `window_background` | `sky` | Wat je door het raam ziet: `sky` (lucht, dag/nacht), `color` (effen kleur), `image` (foto) of `transparent` (kaartachtergrond) |
+| `window_color` | – | Kleur achter het glas bij `window_background: color`: `[r, g, b]` of CSS-kleur |
+| `window_image` | – | Foto achter het glas bij `window_background: image` (upload via de editor) |
+| `window_image_url` | – | Of een URL naar de foto, bv. `/local/tuin.jpg` (heeft voorrang op `window_image`) |
 | `window_opacity` | `100` | Dekking van lucht/uitzicht in % (0 = je kijkt door het glas naar de kaartachtergrond) |
 | `window_night_dim` | `true` | Eigen kleur/foto donkerder maken wanneer de zon onder is |
 | `background_color` | thema | Achtergrondkleur: `[r, g, b]` of een CSS-kleur (`"#20303a"`) |
@@ -66,12 +68,23 @@ info_entities:
 
 ### Achtergrond van het raam
 
-In de editor onder **Raam**: vervang de lucht achter het glas door een kleur of een foto van je eigen uitzicht, en stel in hoe transparant het glas is. De zon blijft er (optioneel) overheen schijnen, en 's nachts wordt de foto gedimd.
+In de visuele editor staat de sectie **Achtergrond raam** standaard open. Kies bij **Wat zie je door het raam?**:
+
+- **Lucht (standaard)**: blauwe lucht overdag, donkere lucht 's nachts (met `show_sun`).
+- **Effen kleur**: er verschijnt een kleurkiezer.
+- **Foto / afbeelding**: upload een foto (bv. je echte uitzicht) of vul een URL in zoals `/local/tuin.jpg`.
+- **Transparant**: je kijkt door het glas naar de kaartachtergrond.
+
+Bij kleur of foto stel je ook de dekking in en of het 's nachts gedimd wordt. De zon blijft er (optioneel) overheen schijnen.
 
 ```yaml
-window_image: /local/uitzicht_keuken.jpg
+window_background: image
+window_image_url: /local/uitzicht_keuken.jpg
 window_opacity: 90
+window_night_dim: true
 ```
+
+Oudere configuraties met alleen `window_color` of `window_image` blijven werken: de kaart kiest dan zelf de juiste modus.
 
 ### Achtergrond van de kaart
 

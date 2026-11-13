@@ -1,5 +1,5 @@
 /*! solar-screen-card | MIT | https://github.com/jodewee/solar-screen-card */
-const SSC_VERSION = "2026.11.13.3";
+const SSC_VERSION = "2026.11.13.5";
 
 const SSC_I18N = {
   nl: {
@@ -20,6 +20,14 @@ const F_OPEN = 1, F_CLOSE = 2, F_SETPOS = 4, F_STOP = 8;
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const SSC_WINDOW_MODES = ["sky", "color", "image", "transparent"];
+// Achtergrond van het raam: expliciet via window_background, anders afgeleid uit oudere opties.
+const sscWindowMode = (c) => {
+  if (SSC_WINDOW_MODES.includes(c.window_background)) return c.window_background;
+  if (c.window_image || c.window_image_url) return "image";
+  if (c.window_color) return "color";
+  return "sky";
+};
 
 class SolarScreenCard extends HTMLElement {
   static getConfigElement() { return document.createElement("solar-screen-card-editor"); }
@@ -152,20 +160,32 @@ class SolarScreenCard extends HTMLElement {
 
   _applyWindowBackground() {
     const c = this._config, sky = this._el.sky;
+    const mode = sscWindowMode(c);
     let col = c.window_color;
     if (Array.isArray(col)) col = col.length >= 3 ? `rgb(${col.slice(0, 3).join(",")})` : null;
-    let img = c.window_image;
+    else if (typeof col !== "string" || !col.trim()) col = null;
+    let img = c.window_image_url || c.window_image;
     if (img && typeof img === "object") img = img.url || img.media_content_id || null;
     const hasOp = c.window_opacity !== undefined && c.window_opacity !== null && c.window_opacity !== "";
     const op = hasOp ? clamp(Number(c.window_opacity), 0, 100) : 100;
-    const custom = !!(col || img);
+    const custom = mode !== "sky";
+    const imgCss = (u) => `url("${String(u).replace(/["\\()]/g, (m) => encodeURIComponent(m))}")`;
     sky.classList.toggle("custom", custom);
     sky.classList.toggle("nodim", c.window_night_dim === false);
-    sky.style.backgroundColor = custom ? (col || "transparent") : "";
-    sky.style.backgroundImage = img
-      ? `url("${String(img).replace(/["\\()]/g, (m) => encodeURIComponent(m))}")`
-      : (custom ? "none" : "");
-    sky.style.opacity = String(op / 100);
+    if (mode === "color") {
+      sky.style.backgroundColor = col || "#2b3a45";
+      sky.style.backgroundImage = "none";
+    } else if (mode === "image") {
+      sky.style.backgroundColor = col || "#2b3a45";
+      sky.style.backgroundImage = img ? imgCss(img) : "none";
+    } else if (mode === "transparent") {
+      sky.style.backgroundColor = "transparent";
+      sky.style.backgroundImage = "none";
+    } else {
+      sky.style.backgroundColor = "";
+      sky.style.backgroundImage = "";
+    }
+    sky.style.opacity = mode === "transparent" ? "1" : String(op / 100);
   }
 
   _bindDrag() {
@@ -467,7 +487,8 @@ const SSC_LABELS = {
   info_entities: "Extra sensoren", show_sun: "Zon tonen",
   background_color: "Achtergrondkleur", background_image: "Achtergrondafbeelding (upload)",
   background_opacity: "Dekking achtergrond (%)", background_blur: "Vervaging achter kaart (px)",
-  window_color: "Kleur achter het raam", window_image: "Uitzicht achter het raam (upload)",
+  window_background: "Wat zie je door het raam?",
+  window_color: "Kleur achter het raam", window_image: "Foto uploaden", window_image_url: "…of URL van de foto",
   window_opacity: "Dekking raam (%)", window_night_dim: "Donkerder maken 's nachts",
 };
 
@@ -496,12 +517,8 @@ class SolarScreenCardEditor extends HTMLElement {
         { name: "window_fov", selector: { number: { min: 10, max: 180, mode: "box", unit_of_measurement: "°" } } },
       ] },
       { name: "info_entities", selector: { entity: { multiple: true } } },
-      { type: "expandable", name: "", title: "Raam", icon: "mdi:window-closed-variant", flatten: true, schema: [
-        { name: "window_color", selector: { color_rgb: {} } },
-        { name: "window_image", selector: { image: {} } },
-        { name: "window_opacity", selector: { number: { min: 0, max: 100, step: 5, mode: "slider", unit_of_measurement: "%" } } },
-        { name: "window_night_dim", selector: { boolean: {} } },
-      ] },
+      { type: "expandable", name: "", title: "Achtergrond raam", icon: "mdi:window-closed-variant", flatten: true, expanded: true,
+        schema: this._windowSchema() },
       { type: "expandable", name: "", title: "Achtergrond kaart", icon: "mdi:palette", flatten: true, schema: [
         { name: "background_color", selector: { color_rgb: {} } },
         { name: "background_image", selector: { image: {} } },
@@ -509,6 +526,28 @@ class SolarScreenCardEditor extends HTMLElement {
         { name: "background_blur", selector: { number: { min: 0, max: 20, step: 1, mode: "slider", unit_of_measurement: "px" } } },
       ] },
     ];
+  }
+
+  _windowSchema() {
+    const mode = sscWindowMode(this._config || {});
+    const s = [
+      { name: "window_background", selector: { select: { mode: "dropdown", options: [
+        { value: "sky", label: "Lucht (standaard, dag/nacht)" },
+        { value: "color", label: "Effen kleur" },
+        { value: "image", label: "Foto / afbeelding" },
+        { value: "transparent", label: "Transparant (kaartachtergrond)" },
+      ] } } },
+    ];
+    if (mode === "color") s.push({ name: "window_color", selector: { color_rgb: {} } });
+    if (mode === "image") {
+      s.push({ name: "window_image", selector: { image: {} } });
+      s.push({ name: "window_image_url", selector: { text: {} } });
+    }
+    if (mode === "color" || mode === "image") {
+      s.push({ name: "window_opacity", selector: { number: { min: 0, max: 100, step: 5, mode: "slider", unit_of_measurement: "%" } } });
+      s.push({ name: "window_night_dim", selector: { boolean: {} } });
+    }
+    return s;
   }
 
   _renderForm() {
@@ -521,21 +560,28 @@ class SolarScreenCardEditor extends HTMLElement {
         background_opacity: "0% = volledig transparant, 100% = volledig dekkend. Geldt enkel voor de achtergrond, niet voor de inhoud.",
         background_blur: "Vervaagt wat achter de kaart zit (handig bij een transparante kaart op een dashboard-achtergrond).",
         background_image: "Upload een afbeelding, of zet in YAML een URL zoals /local/screen.jpg.",
+        window_background: "Kies de achtergrond achter het glas. Bij 'Effen kleur' of 'Foto' verschijnen hieronder extra velden.",
         window_color: "Vervangt de blauwe lucht achter het glas door een effen kleur.",
-        window_image: "Bv. een foto van je echte uitzicht. Upload, of in YAML een URL zoals /local/tuin.jpg.",
+        window_image: "Bv. een foto van je echte uitzicht.",
+        window_image_url: "Alternatief voor uploaden, bv. /local/tuin.jpg. Heeft voorrang op de upload.",
         window_opacity: "Transparantie van de lucht/het uitzicht. 0% = je ziet de kaartachtergrond door het glas.",
         window_night_dim: "Dimt de eigen kleur/foto wanneer de zon onder is.",
       })[s.name];
       this._form.addEventListener("value-changed", (ev) => {
         const cfg = { ...ev.detail.value };
         if (Array.isArray(cfg.presets)) cfg.presets = cfg.presets.map(Number).sort((a, b) => b - a);
-        Object.keys(cfg).forEach((k) => (cfg[k] === "" || cfg[k] === undefined) && delete cfg[k]);
+        Object.keys(cfg).forEach((k) => (cfg[k] === "" || cfg[k] === undefined || cfg[k] === null) && delete cfg[k]);
+        // Standaardwaarde niet in YAML wegschrijven als er geen eigen raam-achtergrond is
+        if (cfg.window_background === "sky" && !this._config?.window_background) delete cfg.window_background;
+        const modeChanged = sscWindowMode(cfg) !== sscWindowMode(this._config || {});
         this._config = cfg;
+        if (modeChanged) this._renderForm();
         this.dispatchEvent(new CustomEvent("config-changed", { detail: { config: cfg }, bubbles: true, composed: true }));
       });
       this.appendChild(this._form);
     }
     const data = { show_sun: true, percent_mode: "open", step: 5, window_fov: 90, background_opacity: 100, background_blur: 0, window_opacity: 100, window_night_dim: true, ...this._config };
+    data.window_background = sscWindowMode(this._config);
     if (Array.isArray(data.presets)) data.presets = data.presets.map(String);
     this._form.hass = this._hass;
     this._form.data = data;
