@@ -1,5 +1,5 @@
 /*! solar-screen-card | MIT | https://github.com/jodewee/solar-screen-card */
-const SSC_VERSION = "2026.11.13.2";
+const SSC_VERSION = "2026.11.13.3";
 
 const SSC_I18N = {
   nl: {
@@ -80,7 +80,8 @@ class SolarScreenCard extends HTMLElement {
         </div>
         <div class="body">
           <div class="window" id="window" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100">
-            <div class="sky" id="sky"><div class="sun" id="sun"></div></div>
+            <div class="sky" id="sky"></div>
+            <div class="sun" id="sun"></div>
             <div class="mullion"></div>
             <div class="fabric" id="fabric"><div class="bar"></div></div>
             <div class="bubble" id="bubble"></div>
@@ -124,6 +125,7 @@ class SolarScreenCard extends HTMLElement {
       b.addEventListener("click", () => this._setPos(Number(b.dataset.pos))));
 
     this._applyBackground();
+    this._applyWindowBackground();
     this._built = true;
   }
 
@@ -146,6 +148,24 @@ class SolarScreenCard extends HTMLElement {
     bg.style.backgroundColor = col || "var(--ha-card-background, var(--card-background-color, #fff))";
     bg.style.backgroundImage = img ? `url("${String(img).replace(/["\\()]/g, (m) => encodeURIComponent(m))}")` : "none";
     bg.style.opacity = String(op / 100);
+  }
+
+  _applyWindowBackground() {
+    const c = this._config, sky = this._el.sky;
+    let col = c.window_color;
+    if (Array.isArray(col)) col = col.length >= 3 ? `rgb(${col.slice(0, 3).join(",")})` : null;
+    let img = c.window_image;
+    if (img && typeof img === "object") img = img.url || img.media_content_id || null;
+    const hasOp = c.window_opacity !== undefined && c.window_opacity !== null && c.window_opacity !== "";
+    const op = hasOp ? clamp(Number(c.window_opacity), 0, 100) : 100;
+    const custom = !!(col || img);
+    sky.classList.toggle("custom", custom);
+    sky.classList.toggle("nodim", c.window_night_dim === false);
+    sky.style.backgroundColor = custom ? (col || "transparent") : "";
+    sky.style.backgroundImage = img
+      ? `url("${String(img).replace(/["\\()]/g, (m) => encodeURIComponent(m))}")`
+      : (custom ? "none" : "");
+    sky.style.opacity = String(op / 100);
   }
 
   _bindDrag() {
@@ -311,7 +331,10 @@ class SolarScreenCard extends HTMLElement {
 
     // Sun
     const sun = c.show_sun ? this._sunInfo() : null;
-    e.sky.classList.toggle("night", !!sun && !sun.up);
+    // Night: default sky switches gradient (only with show_sun); a custom color/photo gets dimmed
+    const sunNow = sun || this._sunInfo();
+    const isNight = !!sunNow && !sunNow.up;
+    e.sky.classList.toggle("night", isNight && (c.show_sun || e.sky.classList.contains("custom")));
     e.sun.hidden = !sun || !sun.up;
     if (sun && sun.up) {
       const elev = clamp(isNaN(sun.el) ? 30 : sun.el, 0, 70);
@@ -394,12 +417,15 @@ SolarScreenCard.styles = `
   .window.disabled { cursor: default; }
   .sky { position: absolute; inset: 0; background: linear-gradient(180deg, #7ec3f0 0%, #bfe3fa 65%, #e8f4e0 100%); transition: background 1s; }
   .sky.night { background: linear-gradient(180deg, #0f1c3a 0%, #24365f 70%, #31415f 100%); }
-  .sun { position: absolute; right: 18%; width: 26px; height: 26px; border-radius: 50%; background: #ffd34d;
+  .sky.custom { background-size: cover; background-position: center; background-repeat: no-repeat; }
+  .sky::after { content: ""; position: absolute; inset: 0; background: rgba(8, 16, 40, .6); opacity: 0; transition: opacity 1s; }
+  .sky.custom.night:not(.nodim)::after { opacity: 1; }
+  .sun { position: absolute; right: 18%; z-index: 1; width: 26px; height: 26px; border-radius: 50%; background: #ffd34d;
     box-shadow: 0 0 14px 4px rgba(255, 205, 60, .55); transition: top 1s; }
   .sun.strong { box-shadow: 0 0 26px 12px rgba(255, 190, 40, .75); }
-  .mullion { position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; margin-left: -2px;
+  .mullion { z-index: 1; position: absolute; top: 0; bottom: 0; left: 50%; width: 4px; margin-left: -2px;
     background: var(--ssc-frame, rgba(var(--rgb-primary-text-color, 33,33,33), .18)); }
-  .fabric { position: absolute; left: 0; right: 0; top: 0; height: 0;
+  .fabric { z-index: 2; position: absolute; left: 0; right: 0; top: 0; height: 0;
     background-color: var(--ssc-fabric, #3d4248);
     background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.07) 0 1px, transparent 1px 3px),
                       repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px);
@@ -408,7 +434,7 @@ SolarScreenCard.styles = `
   .bar { position: absolute; left: -2px; right: -2px; bottom: -3px; height: 7px; border-radius: 3px; background: var(--ssc-bar, #8a9099); }
   .window.moving .fabric { animation: shimmer 1s linear infinite; }
   @keyframes shimmer { 50% { opacity: .75; } }
-  .bubble { position: absolute; left: 50%; transform: translateX(-50%); padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;
+  .bubble { z-index: 3; position: absolute; left: 50%; transform: translateX(-50%); padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;
     background: var(--primary-color); color: var(--text-primary-color, #fff); pointer-events: none; white-space: nowrap; }
 
   .side { display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 8px; }
@@ -441,6 +467,8 @@ const SSC_LABELS = {
   info_entities: "Extra sensoren", show_sun: "Zon tonen",
   background_color: "Achtergrondkleur", background_image: "Achtergrondafbeelding (upload)",
   background_opacity: "Dekking achtergrond (%)", background_blur: "Vervaging achter kaart (px)",
+  window_color: "Kleur achter het raam", window_image: "Uitzicht achter het raam (upload)",
+  window_opacity: "Dekking raam (%)", window_night_dim: "Donkerder maken 's nachts",
 };
 
 class SolarScreenCardEditor extends HTMLElement {
@@ -468,7 +496,13 @@ class SolarScreenCardEditor extends HTMLElement {
         { name: "window_fov", selector: { number: { min: 10, max: 180, mode: "box", unit_of_measurement: "°" } } },
       ] },
       { name: "info_entities", selector: { entity: { multiple: true } } },
-      { type: "expandable", name: "", title: "Achtergrond", icon: "mdi:palette", flatten: true, schema: [
+      { type: "expandable", name: "", title: "Raam", icon: "mdi:window-closed-variant", flatten: true, schema: [
+        { name: "window_color", selector: { color_rgb: {} } },
+        { name: "window_image", selector: { image: {} } },
+        { name: "window_opacity", selector: { number: { min: 0, max: 100, step: 5, mode: "slider", unit_of_measurement: "%" } } },
+        { name: "window_night_dim", selector: { boolean: {} } },
+      ] },
+      { type: "expandable", name: "", title: "Achtergrond kaart", icon: "mdi:palette", flatten: true, schema: [
         { name: "background_color", selector: { color_rgb: {} } },
         { name: "background_image", selector: { image: {} } },
         { name: "background_opacity", selector: { number: { min: 0, max: 100, step: 5, mode: "slider", unit_of_measurement: "%" } } },
@@ -487,6 +521,10 @@ class SolarScreenCardEditor extends HTMLElement {
         background_opacity: "0% = volledig transparant, 100% = volledig dekkend. Geldt enkel voor de achtergrond, niet voor de inhoud.",
         background_blur: "Vervaagt wat achter de kaart zit (handig bij een transparante kaart op een dashboard-achtergrond).",
         background_image: "Upload een afbeelding, of zet in YAML een URL zoals /local/screen.jpg.",
+        window_color: "Vervangt de blauwe lucht achter het glas door een effen kleur.",
+        window_image: "Bv. een foto van je echte uitzicht. Upload, of in YAML een URL zoals /local/tuin.jpg.",
+        window_opacity: "Transparantie van de lucht/het uitzicht. 0% = je ziet de kaartachtergrond door het glas.",
+        window_night_dim: "Dimt de eigen kleur/foto wanneer de zon onder is.",
       })[s.name];
       this._form.addEventListener("value-changed", (ev) => {
         const cfg = { ...ev.detail.value };
@@ -497,7 +535,7 @@ class SolarScreenCardEditor extends HTMLElement {
       });
       this.appendChild(this._form);
     }
-    const data = { show_sun: true, percent_mode: "open", step: 5, window_fov: 90, background_opacity: 100, background_blur: 0, ...this._config };
+    const data = { show_sun: true, percent_mode: "open", step: 5, window_fov: 90, background_opacity: 100, background_blur: 0, window_opacity: 100, window_night_dim: true, ...this._config };
     if (Array.isArray(data.presets)) data.presets = data.presets.map(String);
     this._form.hass = this._hass;
     this._form.data = data;

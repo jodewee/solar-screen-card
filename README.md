@@ -22,7 +22,7 @@ Een Home Assistant Lovelace-kaart om solar-screens (en andere rolluiken/screens,
 ### Handmatig
 1. Kopieer `solar-screen-card.js` naar `/config/www/`.
 2. Voeg een resource toe (**Instellingen → Dashboards → ⋮ → Resources**):
-   `/local/solar-screen-card.js?v=2026.11.13.2`, type **JavaScript module**.
+   `/local/solar-screen-card.js?v=2026.11.13.3`, type **JavaScript module**.
 
 ## Configuratie
 
@@ -55,14 +55,27 @@ info_entities:
 | `window_azimuth` | – | Richting waarin het raam kijkt (N=0, O=90, Z=180, W=270) |
 | `window_fov` | `90` | Breedte in graden waarin de zon op het raam staat |
 | `info_entities` | – | Lijst met extra sensoren (string of `{entity, name, icon}`) |
+| `window_color` | – | Effen kleur achter het glas i.p.v. de blauwe lucht: `[r, g, b]` of CSS-kleur |
+| `window_image` | – | Foto achter het glas (bv. je echte uitzicht): upload via de editor, of `/local/tuin.jpg` |
+| `window_opacity` | `100` | Dekking van lucht/uitzicht in % (0 = je kijkt door het glas naar de kaartachtergrond) |
+| `window_night_dim` | `true` | Eigen kleur/foto donkerder maken wanneer de zon onder is |
 | `background_color` | thema | Achtergrondkleur: `[r, g, b]` of een CSS-kleur (`"#20303a"`) |
 | `background_image` | – | Afbeelding: upload via de editor, of een URL zoals `/local/screen.jpg` |
 | `background_opacity` | `100` | Dekking van de achtergrond in % (0 = transparant). De inhoud blijft volledig zichtbaar |
 | `background_blur` | `0` | Vervaging (px) van wat achter de kaart zit, voor een "glas"-effect |
 
-### Achtergrond
+### Achtergrond van het raam
 
-In de editor staat alles onder **Achtergrond**: kies een kleur, upload een afbeelding, en stel dekking en vervaging in.
+In de editor onder **Raam**: vervang de lucht achter het glas door een kleur of een foto van je eigen uitzicht, en stel in hoe transparant het glas is. De zon blijft er (optioneel) overheen schijnen, en 's nachts wordt de foto gedimd.
+
+```yaml
+window_image: /local/uitzicht_keuken.jpg
+window_opacity: 90
+```
+
+### Achtergrond van de kaart
+
+In de editor staat alles onder **Achtergrond kaart**: kies een kleur, upload een afbeelding, en stel dekking en vervaging in.
 
 ```yaml
 # Transparante "glas"-kaart
