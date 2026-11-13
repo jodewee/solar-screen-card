@@ -2,6 +2,8 @@
 
 Een Home Assistant Lovelace-kaart om solar-screens (en andere rolluiken/screens, `cover.*`) te bedienen.
 
+![Solar Screen Card](images/screenshot.png)
+
 - **Visueel raam**: het screendoek zakt mee met de echte positie.
 - **Slepen**: sleep in het raam naar de gewenste hoogte, loslaten = `cover.set_cover_position`.
 - **Knoppen**: omhoog / stop / omlaag (alleen actief als je cover het ondersteunt).
