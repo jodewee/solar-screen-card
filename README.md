@@ -22,7 +22,7 @@ Een Home Assistant Lovelace-kaart om solar-screens (en andere rolluiken/screens,
 ### Handmatig
 1. Kopieer `solar-screen-card.js` naar `/config/www/`.
 2. Voeg een resource toe (**Instellingen → Dashboards → ⋮ → Resources**):
-   `/local/solar-screen-card.js?v=1.1.0`, type **JavaScript module**.
+   `/local/solar-screen-card.js?v=2026.11.13.2`, type **JavaScript module**.
 
 ## Configuratie
 
