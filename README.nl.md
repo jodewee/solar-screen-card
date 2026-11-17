@@ -1,0 +1,118 @@
+[🇬🇧 English](https://github.com/jodewee/solar-screen-card/blob/main/README.md) · **🇳🇱 Nederlands** · [🇫🇷 Français](https://github.com/jodewee/solar-screen-card/blob/main/README.fr.md) · [🇩🇪 Deutsch](https://github.com/jodewee/solar-screen-card/blob/main/README.de.md) · [🇵🇱 Polski](https://github.com/jodewee/solar-screen-card/blob/main/README.pl.md) · [🇸🇪 Svenska](https://github.com/jodewee/solar-screen-card/blob/main/README.sv.md) · [🇩🇰 Dansk](https://github.com/jodewee/solar-screen-card/blob/main/README.da.md) · [🇳🇴 Norsk](https://github.com/jodewee/solar-screen-card/blob/main/README.nb.md) · [🇪🇸 Español](https://github.com/jodewee/solar-screen-card/blob/main/README.es.md) · [🇮🇹 Italiano](https://github.com/jodewee/solar-screen-card/blob/main/README.it.md)
+
+# Solar Screen Card
+
+Een Home Assistant Lovelace-kaart om solar-screens (en andere rolluiken/screens, `cover.*`) te bedienen.
+
+![Solar Screen Card](images/screenshot.png)
+
+- **Visueel raam**: het screendoek zakt mee met de echte positie.
+- **Slepen**: sleep in het raam naar de gewenste hoogte, loslaten = `cover.set_cover_position`.
+- **Knoppen**: omhoog / stop / omlaag (alleen actief als je cover het ondersteunt).
+- **Snelknoppen**: zelf te kiezen posities (bv. Open, 50%, Dicht).
+- **Zon-indicatie**: dag/nacht-lucht via `sun.sun`; met de oriëntatie van het raam toont de kaart wanneer de zon er echt op staat.
+- **Extra sensoren**: bv. lux, binnentemperatuur of wind als chips onderaan.
+- Visuele editor, sections-view-ready, volgt je HA-thema, beschikbaar in 10 talen.
+
+## Installatie
+
+### Marketplace / HACS (aanbevolen)
+1. Open **Instellingen → Marketplace** (of HACS op oudere versies).
+2. Zoek naar **Solar Screen Card**.
+3. Installeer de kaart en herlaad de browser.
+
+### Marketplace / HACS: aangepaste repository (fallback)
+Vind je de kaart niet via zoeken (bv. omdat ze nog niet in de catalogus staat)? Voeg de repository dan zelf toe:
+1. Open **Instellingen → Marketplace** (of HACS) → **Toevoegen via link / Custom repositories**.
+2. Voeg `https://github.com/jodewee/solar-screen-card` toe als type **Dashboard / Lovelace**.
+3. Installeer **Solar Screen Card** en herlaad de browser.
+
+### Handmatig
+1. Kopieer `solar-screen-card.js` naar `/config/www/`.
+2. Voeg een resource toe (**Instellingen → Dashboards → ⋮ → Resources**):
+   `/local/solar-screen-card.js?v=2026.11.17.2`, type **JavaScript module**.
+
+## Configuratie
+
+```yaml
+type: custom:solar-screen-card
+entity: cover.screen_keuken
+name: Screen keuken
+moving_entity: sensor.screen_keuken_moving   # optioneel
+window_azimuth: 180        # raam kijkt naar het zuiden
+window_fov: 100            # zon telt als "op het raam" binnen ±50°
+percent_mode: closed       # toon "% dicht" i.p.v. "% open"
+presets: [100, 50, 20, 0]
+info_entities:
+  - sensor.lux_buiten
+  - entity: sensor.temperatuur_keuken
+    name: Binnen
+```
+
+| Optie | Standaard | Uitleg |
+|---|---|---|
+| `entity` | **verplicht** | De `cover`-entiteit van het screen |
+| `name` | friendly name | Naam bovenaan |
+| `icon` | `mdi:blinds` | Eigen icoon |
+| `moving_entity` | – | Sensor die beweging meldt (`up`/`down`/`opening`/`closing`), bv. van Zigbee2MQTT |
+| `presets` | `[0, 50, 100]` | Snelknoppen als positie in % open (HA-conventie: 100 = open) |
+| `percent_mode` | `open` | `open` of `closed`: hoe het percentage getoond wordt |
+| `step` | `5` | Afronding in % bij slepen |
+| `show_sun` | `true` | Lucht en zon tonen |
+| `sun_entity` | `sun.sun` | Zon-entiteit |
+| `window_azimuth` | – | Richting waarin het raam kijkt (N=0, O=90, Z=180, W=270) |
+| `window_fov` | `90` | Breedte in graden waarin de zon op het raam staat |
+| `info_entities` | – | Lijst met extra sensoren (string of `{entity, name, icon}`) |
+| `window_background` | `sky` | Wat je door het raam ziet: `sky` (lucht, dag/nacht), `color` (effen kleur), `image` (foto) of `transparent` (kaartachtergrond) |
+| `window_color` | – | Kleur achter het glas bij `window_background: color`: `[r, g, b]` of CSS-kleur |
+| `window_image` | – | Foto achter het glas bij `window_background: image` (upload via de editor) |
+| `window_image_url` | – | Of een URL naar de foto, bv. `/local/tuin.jpg` (heeft voorrang op `window_image`) |
+| `window_opacity` | `100` | Dekking van lucht/uitzicht in % (0 = je kijkt door het glas naar de kaartachtergrond) |
+| `window_night_dim` | `true` | Eigen kleur/foto donkerder maken wanneer de zon onder is |
+| `background_color` | thema | Achtergrondkleur: `[r, g, b]` of een CSS-kleur (`"#20303a"`) |
+| `background_image` | – | Afbeelding: upload via de editor, of een URL zoals `/local/screen.jpg` |
+| `background_opacity` | `100` | Dekking van de achtergrond in % (0 = transparant). De inhoud blijft volledig zichtbaar |
+| `background_blur` | `0` | Vervaging (px) van wat achter de kaart zit, voor een "glas"-effect |
+
+### Achtergrond van het raam
+
+In de visuele editor staat de sectie **Achtergrond raam** standaard open. Kies bij **Wat zie je door het raam?**:
+
+- **Lucht (standaard)**: blauwe lucht overdag, donkere lucht 's nachts (met `show_sun`).
+- **Effen kleur**: er verschijnt een kleurkiezer.
+- **Foto / afbeelding**: upload een foto (bv. je echte uitzicht) of vul een URL in zoals `/local/tuin.jpg`.
+- **Transparant**: je kijkt door het glas naar de kaartachtergrond.
+
+Bij kleur of foto stel je ook de dekking in en of het 's nachts gedimd wordt. De zon blijft er (optioneel) overheen schijnen.
+
+```yaml
+window_background: image
+window_image_url: /local/uitzicht_keuken.jpg
+window_opacity: 90
+window_night_dim: true
+```
+
+Oudere configuraties met alleen `window_color` of `window_image` blijven werken: de kaart kiest dan zelf de juiste modus.
+
+### Achtergrond van de kaart
+
+In de editor staat alles onder **Achtergrond kaart**: kies een kleur, upload een afbeelding, en stel dekking en vervaging in.
+
+```yaml
+# Transparante "glas"-kaart
+background_opacity: 30
+background_blur: 8
+
+# Eigen foto als achtergrond
+background_image: /local/keuken.jpg
+background_opacity: 60
+```
+
+Kleuren aanpassen kan via thema-variabelen: `--ssc-fabric`, `--ssc-bar`, `--ssc-frame`.
+
+## Talen
+
+De kaart en de visuele editor volgen de taal van Home Assistant: Engels, Nederlands, Frans, Duits, Pools, Zweeds, Deens, Noors (Bokmål), Spaans en Italiaans. Andere talen vallen terug op Engels. Verbeteringen aan een vertaling zijn welkom via een pull request.
+
+## Licentie
+MIT

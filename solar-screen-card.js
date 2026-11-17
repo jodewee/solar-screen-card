@@ -1,5 +1,5 @@
 /*! solar-screen-card | MIT | https://github.com/jodewee/solar-screen-card */
-const SSC_VERSION = "2026.11.17.1";
+const SSC_VERSION = "2026.11.17.2";
 
 const SSC_I18N = {
   nl: {
@@ -7,14 +7,336 @@ const SSC_I18N = {
     unavailable: "Niet beschikbaar", pct_open: "% open", pct_closed: "% dicht",
     sun_on: "Zon op het raam", sun_off: "Geen directe zon", night: "Zon onder",
     up: "Omhoog", down: "Omlaag", stop: "Stop", not_found: "Entiteit niet gevonden",
+    sec_window: "Achtergrond raam", sec_card: "Achtergrond kaart",
+    opt_sky: "Lucht (standaard, dag/nacht)", opt_color: "Effen kleur", opt_image: "Foto / afbeelding", opt_transparent: "Transparant (kaartachtergrond)",
+    desc: "Bedien je solar-screens/rolluiken met een visueel raam, sleepbediening, snelknoppen en zon-indicatie.",
+    labels: {
+      entity: "Screen (cover)", name: "Naam", icon: "Icoon", moving_entity: "Beweging-sensor (optioneel)",
+      window_azimuth: "Oriëntatie raam (°)", window_fov: "Zonhoek raam (°)", sun_entity: "Zon-entiteit",
+      percent_mode: "Percentage tonen als", presets: "Snelknoppen (positie % open)", step: "Stapgrootte slepen (%)",
+      info_entities: "Extra sensoren", show_sun: "Zon tonen",
+      background_color: "Achtergrondkleur", background_image: "Achtergrondafbeelding (upload)",
+      background_opacity: "Dekking achtergrond (%)", background_blur: "Vervaging achter kaart (px)",
+      window_background: "Wat zie je door het raam?",
+      window_color: "Kleur achter het raam", window_image: "Foto uploaden", window_image_url: "…of URL van de foto",
+      window_opacity: "Dekking raam (%)", window_night_dim: "Donkerder maken 's nachts",
+    },
+    helpers: {
+      window_azimuth: "Richting waarin het raam kijkt: N=0, O=90, Z=180, W=270. Leeg = geen zon-detectie.",
+      background_opacity: "0% = volledig transparant, 100% = volledig dekkend. Geldt enkel voor de achtergrond, niet voor de inhoud.",
+      background_blur: "Vervaagt wat achter de kaart zit (handig bij een transparante kaart op een dashboard-achtergrond).",
+      background_image: "Upload een afbeelding, of zet in YAML een URL zoals /local/screen.jpg.",
+      window_background: "Kies de achtergrond achter het glas. Bij 'Effen kleur' of 'Foto' verschijnen hieronder extra velden.",
+      window_color: "Vervangt de blauwe lucht achter het glas door een effen kleur.",
+      window_image: "Bv. een foto van je echte uitzicht.",
+      window_image_url: "Alternatief voor uploaden, bv. /local/tuin.jpg. Heeft voorrang op de upload.",
+      window_opacity: "Transparantie van de lucht/het uitzicht. 0% = je ziet de kaartachtergrond door het glas.",
+      window_night_dim: "Dimt de eigen kleur/foto wanneer de zon onder is.",
+    },
   },
   en: {
     open: "Open", closed: "Closed", opening: "Opening", closing: "Closing",
     unavailable: "Unavailable", pct_open: "% open", pct_closed: "% closed",
     sun_on: "Sun on the window", sun_off: "No direct sun", night: "Sun is down",
     up: "Up", down: "Down", stop: "Stop", not_found: "Entity not found",
+    sec_window: "Window background", sec_card: "Card background",
+    opt_sky: "Sky (default, day/night)", opt_color: "Solid color", opt_image: "Photo / image", opt_transparent: "Transparent (card background)",
+    desc: "Control your solar screens/blinds with a visual window, drag control, quick buttons and sun indication.",
+    labels: {
+      entity: "Screen (cover)", name: "Name", icon: "Icon", moving_entity: "Movement sensor (optional)",
+      window_azimuth: "Window orientation (°)", window_fov: "Window sun angle (°)", sun_entity: "Sun entity",
+      percent_mode: "Show percentage as", presets: "Quick buttons (position % open)", step: "Drag step (%)",
+      info_entities: "Extra sensors", show_sun: "Show sun",
+      background_color: "Background color", background_image: "Background image (upload)",
+      background_opacity: "Background opacity (%)", background_blur: "Blur behind card (px)",
+      window_background: "What do you see through the window?",
+      window_color: "Color behind the window", window_image: "Upload photo", window_image_url: "…or photo URL",
+      window_opacity: "Window opacity (%)", window_night_dim: "Darken at night",
+    },
+    helpers: {
+      window_azimuth: "Direction the window faces: N=0, E=90, S=180, W=270. Empty = no sun detection.",
+      background_opacity: "0% = fully transparent, 100% = fully opaque. Applies only to the background, not the content.",
+      background_blur: "Blurs what is behind the card (useful for a transparent card on a dashboard background).",
+      background_image: "Upload an image, or set a URL in YAML such as /local/screen.jpg.",
+      window_background: "Choose the background behind the glass. With 'Solid color' or 'Photo', extra fields appear below.",
+      window_color: "Replaces the blue sky behind the glass with a solid color.",
+      window_image: "E.g. a photo of your real view.",
+      window_image_url: "Alternative to uploading, e.g. /local/garden.jpg. Takes precedence over the upload.",
+      window_opacity: "Transparency of the sky/view. 0% = you see the card background through the glass.",
+      window_night_dim: "Dims your own color/photo when the sun is down.",
+    },
+  },
+  fr: {
+    open: "Ouvert", closed: "Fermé", opening: "Ouverture", closing: "Fermeture",
+    unavailable: "Indisponible", pct_open: "% ouvert", pct_closed: "% fermé",
+    sun_on: "Soleil sur la fenêtre", sun_off: "Pas de soleil direct", night: "Soleil couché",
+    up: "Monter", down: "Descendre", stop: "Stop", not_found: "Entité introuvable",
+    sec_window: "Fond de la fenêtre", sec_card: "Fond de la carte",
+    opt_sky: "Ciel (par défaut, jour/nuit)", opt_color: "Couleur unie", opt_image: "Photo / image", opt_transparent: "Transparent (fond de la carte)",
+    desc: "Pilotez vos screens/volets avec une fenêtre visuelle, un contrôle par glissement, des boutons rapides et une indication du soleil.",
+    labels: {
+      entity: "Store (cover)", name: "Nom", icon: "Icône", moving_entity: "Capteur de mouvement (optionnel)",
+      window_azimuth: "Orientation de la fenêtre (°)", window_fov: "Angle solaire de la fenêtre (°)", sun_entity: "Entité soleil",
+      percent_mode: "Afficher le pourcentage en", presets: "Boutons rapides (position % ouvert)", step: "Pas de glissement (%)",
+      info_entities: "Capteurs supplémentaires", show_sun: "Afficher le soleil",
+      background_color: "Couleur de fond", background_image: "Image de fond (téléversement)",
+      background_opacity: "Opacité du fond (%)", background_blur: "Flou derrière la carte (px)",
+      window_background: "Que voit-on par la fenêtre ?",
+      window_color: "Couleur derrière la fenêtre", window_image: "Téléverser une photo", window_image_url: "…ou URL de la photo",
+      window_opacity: "Opacité de la fenêtre (%)", window_night_dim: "Assombrir la nuit",
+    },
+    helpers: {
+      window_azimuth: "Direction vers laquelle la fenêtre est orientée : N=0, E=90, S=180, O=270. Vide = pas de détection du soleil.",
+      background_opacity: "0 % = entièrement transparent, 100 % = entièrement opaque. S'applique uniquement au fond, pas au contenu.",
+      background_blur: "Floute ce qui se trouve derrière la carte (utile pour une carte transparente sur un fond de tableau de bord).",
+      background_image: "Téléversez une image, ou indiquez en YAML une URL comme /local/screen.jpg.",
+      window_background: "Choisissez le fond derrière la vitre. Avec « Couleur unie » ou « Photo », des champs supplémentaires apparaissent ci-dessous.",
+      window_color: "Remplace le ciel bleu derrière la vitre par une couleur unie.",
+      window_image: "Par ex. une photo de votre vraie vue.",
+      window_image_url: "Alternative au téléversement, par ex. /local/jardin.jpg. Prioritaire sur le téléversement.",
+      window_opacity: "Transparence du ciel/de la vue. 0 % = vous voyez le fond de la carte à travers la vitre.",
+      window_night_dim: "Assombrit votre couleur/photo quand le soleil est couché.",
+    },
+  },
+  de: {
+    open: "Offen", closed: "Geschlossen", opening: "Öffnet", closing: "Schließt",
+    unavailable: "Nicht verfügbar", pct_open: "% offen", pct_closed: "% geschlossen",
+    sun_on: "Sonne auf dem Fenster", sun_off: "Keine direkte Sonne", night: "Sonne untergegangen",
+    up: "Hoch", down: "Runter", stop: "Stopp", not_found: "Entität nicht gefunden",
+    sec_window: "Fensterhintergrund", sec_card: "Kartenhintergrund",
+    opt_sky: "Himmel (Standard, Tag/Nacht)", opt_color: "Einfarbig", opt_image: "Foto / Bild", opt_transparent: "Transparent (Kartenhintergrund)",
+    desc: "Steuere deine Markisen/Rollläden mit einem visuellen Fenster, Ziehbedienung, Schnelltasten und Sonnenanzeige.",
+    labels: {
+      entity: "Beschattung (cover)", name: "Name", icon: "Symbol", moving_entity: "Bewegungssensor (optional)",
+      window_azimuth: "Fensterausrichtung (°)", window_fov: "Sonnenwinkel Fenster (°)", sun_entity: "Sonnen-Entität",
+      percent_mode: "Prozent anzeigen als", presets: "Schnelltasten (Position % offen)", step: "Schrittweite beim Ziehen (%)",
+      info_entities: "Zusätzliche Sensoren", show_sun: "Sonne anzeigen",
+      background_color: "Hintergrundfarbe", background_image: "Hintergrundbild (Upload)",
+      background_opacity: "Deckkraft Hintergrund (%)", background_blur: "Unschärfe hinter der Karte (px)",
+      window_background: "Was sieht man durch das Fenster?",
+      window_color: "Farbe hinter dem Fenster", window_image: "Foto hochladen", window_image_url: "…oder URL des Fotos",
+      window_opacity: "Deckkraft Fenster (%)", window_night_dim: "Nachts abdunkeln",
+    },
+    helpers: {
+      window_azimuth: "Richtung, in die das Fenster zeigt: N=0, O=90, S=180, W=270. Leer = keine Sonnenerkennung.",
+      background_opacity: "0 % = vollständig transparent, 100 % = vollständig deckend. Gilt nur für den Hintergrund, nicht für den Inhalt.",
+      background_blur: "Macht unscharf, was hinter der Karte liegt (praktisch für eine transparente Karte auf einem Dashboard-Hintergrund).",
+      background_image: "Lade ein Bild hoch oder gib in YAML eine URL wie /local/screen.jpg an.",
+      window_background: "Wähle den Hintergrund hinter dem Glas. Bei „Einfarbig“ oder „Foto“ erscheinen unten zusätzliche Felder.",
+      window_color: "Ersetzt den blauen Himmel hinter dem Glas durch eine einfarbige Fläche.",
+      window_image: "Z. B. ein Foto deiner echten Aussicht.",
+      window_image_url: "Alternative zum Hochladen, z. B. /local/garten.jpg. Hat Vorrang vor dem Upload.",
+      window_opacity: "Transparenz des Himmels/der Aussicht. 0 % = du siehst den Kartenhintergrund durch das Glas.",
+      window_night_dim: "Dunkelt deine eigene Farbe/dein Foto ab, wenn die Sonne untergegangen ist.",
+    },
+  },
+  pl: {
+    open: "Otwarte", closed: "Zamknięte", opening: "Otwieranie", closing: "Zamykanie",
+    unavailable: "Niedostępne", pct_open: "% otwarte", pct_closed: "% zamknięte",
+    sun_on: "Słońce na oknie", sun_off: "Brak bezpośredniego słońca", night: "Słońce zaszło",
+    up: "W górę", down: "W dół", stop: "Stop", not_found: "Nie znaleziono encji",
+    sec_window: "Tło okna", sec_card: "Tło karty",
+    opt_sky: "Niebo (domyślnie, dzień/noc)", opt_color: "Jednolity kolor", opt_image: "Zdjęcie / obraz", opt_transparent: "Przezroczyste (tło karty)",
+    desc: "Steruj roletami zewnętrznymi/żaluzjami za pomocą wizualnego okna, przeciągania, szybkich przycisków i wskaźnika słońca.",
+    labels: {
+      entity: "Roleta (cover)", name: "Nazwa", icon: "Ikona", moving_entity: "Czujnik ruchu (opcjonalnie)",
+      window_azimuth: "Orientacja okna (°)", window_fov: "Kąt słońca okna (°)", sun_entity: "Encja słońca",
+      percent_mode: "Pokaż procent jako", presets: "Szybkie przyciski (pozycja % otwarcia)", step: "Krok przeciągania (%)",
+      info_entities: "Dodatkowe czujniki", show_sun: "Pokaż słońce",
+      background_color: "Kolor tła", background_image: "Obraz tła (przesyłanie)",
+      background_opacity: "Krycie tła (%)", background_blur: "Rozmycie za kartą (px)",
+      window_background: "Co widać przez okno?",
+      window_color: "Kolor za oknem", window_image: "Prześlij zdjęcie", window_image_url: "…lub URL zdjęcia",
+      window_opacity: "Krycie okna (%)", window_night_dim: "Przyciemniaj w nocy",
+    },
+    helpers: {
+      window_azimuth: "Kierunek, w którym skierowane jest okno: północ=0, wschód=90, południe=180, zachód=270. Puste = brak wykrywania słońca.",
+      background_opacity: "0% = całkowicie przezroczyste, 100% = całkowicie kryjące. Dotyczy tylko tła, nie zawartości.",
+      background_blur: "Rozmywa to, co znajduje się za kartą (przydatne dla przezroczystej karty na tle pulpitu).",
+      background_image: "Prześlij obraz lub podaj w YAML adres URL, np. /local/screen.jpg.",
+      window_background: "Wybierz tło za szybą. Przy „Jednolity kolor” lub „Zdjęcie” poniżej pojawią się dodatkowe pola.",
+      window_color: "Zastępuje niebieskie niebo za szybą jednolitym kolorem.",
+      window_image: "Np. zdjęcie prawdziwego widoku z okna.",
+      window_image_url: "Alternatywa dla przesyłania, np. /local/ogrod.jpg. Ma pierwszeństwo przed przesłanym plikiem.",
+      window_opacity: "Przezroczystość nieba/widoku. 0% = przez szybę widać tło karty.",
+      window_night_dim: "Przyciemnia własny kolor/zdjęcie, gdy słońce zajdzie.",
+    },
+  },
+  sv: {
+    open: "Öppen", closed: "Stängd", opening: "Öppnas", closing: "Stängs",
+    unavailable: "Ej tillgänglig", pct_open: "% öppen", pct_closed: "% stängd",
+    sun_on: "Sol på fönstret", sun_off: "Ingen direkt sol", night: "Solen har gått ner",
+    up: "Upp", down: "Ner", stop: "Stopp", not_found: "Entiteten hittades inte",
+    sec_window: "Fönsterbakgrund", sec_card: "Kortbakgrund",
+    opt_sky: "Himmel (standard, dag/natt)", opt_color: "Enfärgad", opt_image: "Foto / bild", opt_transparent: "Genomskinlig (kortets bakgrund)",
+    desc: "Styr dina markiser/rullgardiner med ett visuellt fönster, dragstyrning, snabbknappar och solindikering.",
+    labels: {
+      entity: "Markis/rullgardin (cover)", name: "Namn", icon: "Ikon", moving_entity: "Rörelsesensor (valfri)",
+      window_azimuth: "Fönstrets riktning (°)", window_fov: "Solvinkel fönster (°)", sun_entity: "Solentitet",
+      percent_mode: "Visa procent som", presets: "Snabbknappar (position % öppen)", step: "Steg vid dragning (%)",
+      info_entities: "Extra sensorer", show_sun: "Visa sol",
+      background_color: "Bakgrundsfärg", background_image: "Bakgrundsbild (uppladdning)",
+      background_opacity: "Bakgrundens opacitet (%)", background_blur: "Oskärpa bakom kortet (px)",
+      window_background: "Vad ser du genom fönstret?",
+      window_color: "Färg bakom fönstret", window_image: "Ladda upp foto", window_image_url: "…eller URL till fotot",
+      window_opacity: "Fönstrets opacitet (%)", window_night_dim: "Mörka ner på natten",
+    },
+    helpers: {
+      window_azimuth: "Riktning som fönstret vetter mot: N=0, Ö=90, S=180, V=270. Tomt = ingen soldetektering.",
+      background_opacity: "0 % = helt genomskinlig, 100 % = helt täckande. Gäller bara bakgrunden, inte innehållet.",
+      background_blur: "Gör det som ligger bakom kortet suddigt (praktiskt för ett genomskinligt kort på en instrumentpanelsbakgrund).",
+      background_image: "Ladda upp en bild eller ange i YAML en URL som /local/screen.jpg.",
+      window_background: "Välj bakgrund bakom glaset. Med ”Enfärgad” eller ”Foto” visas fler fält nedan.",
+      window_color: "Ersätter den blå himlen bakom glaset med en enfärgad yta.",
+      window_image: "T.ex. ett foto av din riktiga utsikt.",
+      window_image_url: "Alternativ till uppladdning, t.ex. /local/tradgard.jpg. Har företräde framför uppladdningen.",
+      window_opacity: "Genomskinlighet för himlen/utsikten. 0 % = du ser kortets bakgrund genom glaset.",
+      window_night_dim: "Mörkar ner din egen färg/ditt foto när solen har gått ner.",
+    },
+  },
+  da: {
+    open: "Åben", closed: "Lukket", opening: "Åbner", closing: "Lukker",
+    unavailable: "Ikke tilgængelig", pct_open: "% åben", pct_closed: "% lukket",
+    sun_on: "Sol på vinduet", sun_off: "Ingen direkte sol", night: "Solen er gået ned",
+    up: "Op", down: "Ned", stop: "Stop", not_found: "Entitet ikke fundet",
+    sec_window: "Vinduesbaggrund", sec_card: "Kortbaggrund",
+    opt_sky: "Himmel (standard, dag/nat)", opt_color: "Ensfarvet", opt_image: "Foto / billede", opt_transparent: "Gennemsigtig (kortets baggrund)",
+    desc: "Styr dine screens/rullegardiner med et visuelt vindue, trækstyring, hurtigknapper og solindikator.",
+    labels: {
+      entity: "Screen/rullegardin (cover)", name: "Navn", icon: "Ikon", moving_entity: "Bevægelsessensor (valgfri)",
+      window_azimuth: "Vinduets retning (°)", window_fov: "Solvinkel vindue (°)", sun_entity: "Sol-entitet",
+      percent_mode: "Vis procent som", presets: "Hurtigknapper (position % åben)", step: "Trin ved træk (%)",
+      info_entities: "Ekstra sensorer", show_sun: "Vis sol",
+      background_color: "Baggrundsfarve", background_image: "Baggrundsbillede (upload)",
+      background_opacity: "Baggrundens dækkevne (%)", background_blur: "Sløring bag kortet (px)",
+      window_background: "Hvad ser du gennem vinduet?",
+      window_color: "Farve bag vinduet", window_image: "Upload foto", window_image_url: "…eller URL til foto",
+      window_opacity: "Vinduets dækkevne (%)", window_night_dim: "Gør mørkere om natten",
+    },
+    helpers: {
+      window_azimuth: "Retning vinduet vender mod: N=0, Ø=90, S=180, V=270. Tom = ingen solregistrering.",
+      background_opacity: "0 % = helt gennemsigtig, 100 % = helt dækkende. Gælder kun baggrunden, ikke indholdet.",
+      background_blur: "Slører det, der ligger bag kortet (praktisk til et gennemsigtigt kort på en dashboard-baggrund).",
+      background_image: "Upload et billede, eller angiv i YAML en URL som /local/screen.jpg.",
+      window_background: "Vælg baggrunden bag glasset. Ved »Ensfarvet« eller »Foto« vises ekstra felter nedenfor.",
+      window_color: "Erstatter den blå himmel bag glasset med en ensfarvet flade.",
+      window_image: "F.eks. et foto af din rigtige udsigt.",
+      window_image_url: "Alternativ til upload, f.eks. /local/have.jpg. Har forrang for uploadet.",
+      window_opacity: "Gennemsigtighed for himlen/udsigten. 0 % = du ser kortets baggrund gennem glasset.",
+      window_night_dim: "Gør din egen farve/dit foto mørkere, når solen er gået ned.",
+    },
+  },
+  nb: {
+    open: "Åpen", closed: "Lukket", opening: "Åpner", closing: "Lukker",
+    unavailable: "Utilgjengelig", pct_open: "% åpen", pct_closed: "% lukket",
+    sun_on: "Sol på vinduet", sun_off: "Ingen direkte sol", night: "Solen har gått ned",
+    up: "Opp", down: "Ned", stop: "Stopp", not_found: "Fant ikke entiteten",
+    sec_window: "Vindusbakgrunn", sec_card: "Kortbakgrunn",
+    opt_sky: "Himmel (standard, dag/natt)", opt_color: "Ensfarget", opt_image: "Foto / bilde", opt_transparent: "Gjennomsiktig (kortets bakgrunn)",
+    desc: "Styr screens/rullegardiner med et visuelt vindu, drastyring, hurtigknapper og solindikator.",
+    labels: {
+      entity: "Screen/rullegardin (cover)", name: "Navn", icon: "Ikon", moving_entity: "Bevegelsessensor (valgfri)",
+      window_azimuth: "Vinduets retning (°)", window_fov: "Solvinkel vindu (°)", sun_entity: "Sol-entitet",
+      percent_mode: "Vis prosent som", presets: "Hurtigknapper (posisjon % åpen)", step: "Steg ved draging (%)",
+      info_entities: "Ekstra sensorer", show_sun: "Vis sol",
+      background_color: "Bakgrunnsfarge", background_image: "Bakgrunnsbilde (opplasting)",
+      background_opacity: "Bakgrunnens dekkevne (%)", background_blur: "Uskarphet bak kortet (px)",
+      window_background: "Hva ser du gjennom vinduet?",
+      window_color: "Farge bak vinduet", window_image: "Last opp bilde", window_image_url: "…eller URL til bildet",
+      window_opacity: "Vinduets dekkevne (%)", window_night_dim: "Gjør mørkere om natten",
+    },
+    helpers: {
+      window_azimuth: "Retningen vinduet vender mot: N=0, Ø=90, S=180, V=270. Tomt = ingen solregistrering.",
+      background_opacity: "0 % = helt gjennomsiktig, 100 % = helt dekkende. Gjelder bare bakgrunnen, ikke innholdet.",
+      background_blur: "Gjør det som ligger bak kortet uskarpt (nyttig for et gjennomsiktig kort på en dashbord-bakgrunn).",
+      background_image: "Last opp et bilde, eller angi i YAML en URL som /local/screen.jpg.",
+      window_background: "Velg bakgrunnen bak glasset. Med «Ensfarget» eller «Foto» vises flere felt nedenfor.",
+      window_color: "Erstatter den blå himmelen bak glasset med en ensfarget flate.",
+      window_image: "F.eks. et bilde av den ekte utsikten din.",
+      window_image_url: "Alternativ til opplasting, f.eks. /local/hage.jpg. Har forrang foran opplastingen.",
+      window_opacity: "Gjennomsiktighet for himmelen/utsikten. 0 % = du ser kortets bakgrunn gjennom glasset.",
+      window_night_dim: "Gjør din egen farge/ditt bilde mørkere når solen har gått ned.",
+    },
+  },
+  es: {
+    open: "Abierto", closed: "Cerrado", opening: "Abriendo", closing: "Cerrando",
+    unavailable: "No disponible", pct_open: "% abierto", pct_closed: "% cerrado",
+    sun_on: "Sol en la ventana", sun_off: "Sin sol directo", night: "Sol puesto",
+    up: "Subir", down: "Bajar", stop: "Parar", not_found: "Entidad no encontrada",
+    sec_window: "Fondo de la ventana", sec_card: "Fondo de la tarjeta",
+    opt_sky: "Cielo (predeterminado, día/noche)", opt_color: "Color sólido", opt_image: "Foto / imagen", opt_transparent: "Transparente (fondo de la tarjeta)",
+    desc: "Controla tus estores/persianas con una ventana visual, control por arrastre, botones rápidos e indicación del sol.",
+    labels: {
+      entity: "Estor (cover)", name: "Nombre", icon: "Icono", moving_entity: "Sensor de movimiento (opcional)",
+      window_azimuth: "Orientación de la ventana (°)", window_fov: "Ángulo solar de la ventana (°)", sun_entity: "Entidad del sol",
+      percent_mode: "Mostrar porcentaje como", presets: "Botones rápidos (posición % abierto)", step: "Paso al arrastrar (%)",
+      info_entities: "Sensores adicionales", show_sun: "Mostrar sol",
+      background_color: "Color de fondo", background_image: "Imagen de fondo (subir)",
+      background_opacity: "Opacidad del fondo (%)", background_blur: "Desenfoque detrás de la tarjeta (px)",
+      window_background: "¿Qué se ve por la ventana?",
+      window_color: "Color detrás de la ventana", window_image: "Subir foto", window_image_url: "…o URL de la foto",
+      window_opacity: "Opacidad de la ventana (%)", window_night_dim: "Oscurecer de noche",
+    },
+    helpers: {
+      window_azimuth: "Dirección hacia la que mira la ventana: N=0, E=90, S=180, O=270. Vacío = sin detección del sol.",
+      background_opacity: "0 % = totalmente transparente, 100 % = totalmente opaco. Solo afecta al fondo, no al contenido.",
+      background_blur: "Desenfoca lo que hay detrás de la tarjeta (útil para una tarjeta transparente sobre un fondo de panel).",
+      background_image: "Sube una imagen o indica en YAML una URL como /local/screen.jpg.",
+      window_background: "Elige el fondo detrás del cristal. Con «Color sólido» o «Foto» aparecen campos adicionales abajo.",
+      window_color: "Sustituye el cielo azul detrás del cristal por un color sólido.",
+      window_image: "P. ej. una foto de tu vista real.",
+      window_image_url: "Alternativa a subir, p. ej. /local/jardin.jpg. Tiene prioridad sobre la subida.",
+      window_opacity: "Transparencia del cielo/la vista. 0 % = ves el fondo de la tarjeta a través del cristal.",
+      window_night_dim: "Oscurece tu color/foto cuando el sol se ha puesto.",
+    },
+  },
+  it: {
+    open: "Aperto", closed: "Chiuso", opening: "In apertura", closing: "In chiusura",
+    unavailable: "Non disponibile", pct_open: "% aperto", pct_closed: "% chiuso",
+    sun_on: "Sole sulla finestra", sun_off: "Nessun sole diretto", night: "Sole tramontato",
+    up: "Su", down: "Giù", stop: "Stop", not_found: "Entità non trovata",
+    sec_window: "Sfondo finestra", sec_card: "Sfondo scheda",
+    opt_sky: "Cielo (predefinito, giorno/notte)", opt_color: "Tinta unita", opt_image: "Foto / immagine", opt_transparent: "Trasparente (sfondo della scheda)",
+    desc: "Controlla le tue tende solari/tapparelle con una finestra visiva, trascinamento, pulsanti rapidi e indicazione del sole.",
+    labels: {
+      entity: "Tenda (cover)", name: "Nome", icon: "Icona", moving_entity: "Sensore di movimento (opzionale)",
+      window_azimuth: "Orientamento finestra (°)", window_fov: "Angolo solare finestra (°)", sun_entity: "Entità sole",
+      percent_mode: "Mostra percentuale come", presets: "Pulsanti rapidi (posizione % aperto)", step: "Passo di trascinamento (%)",
+      info_entities: "Sensori aggiuntivi", show_sun: "Mostra sole",
+      background_color: "Colore di sfondo", background_image: "Immagine di sfondo (caricamento)",
+      background_opacity: "Opacità sfondo (%)", background_blur: "Sfocatura dietro la scheda (px)",
+      window_background: "Cosa si vede dalla finestra?",
+      window_color: "Colore dietro la finestra", window_image: "Carica foto", window_image_url: "…o URL della foto",
+      window_opacity: "Opacità finestra (%)", window_night_dim: "Scurisci di notte",
+    },
+    helpers: {
+      window_azimuth: "Direzione verso cui guarda la finestra: N=0, E=90, S=180, O=270. Vuoto = nessun rilevamento del sole.",
+      background_opacity: "0% = completamente trasparente, 100% = completamente opaco. Vale solo per lo sfondo, non per il contenuto.",
+      background_blur: "Sfoca ciò che si trova dietro la scheda (utile per una scheda trasparente su uno sfondo della dashboard).",
+      background_image: "Carica un'immagine o imposta in YAML un URL come /local/screen.jpg.",
+      window_background: "Scegli lo sfondo dietro il vetro. Con «Tinta unita» o «Foto» compaiono altri campi qui sotto.",
+      window_color: "Sostituisce il cielo azzurro dietro il vetro con una tinta unita.",
+      window_image: "Ad es. una foto della tua vista reale.",
+      window_image_url: "Alternativa al caricamento, ad es. /local/giardino.jpg. Ha la precedenza sul caricamento.",
+      window_opacity: "Trasparenza del cielo/della vista. 0% = vedi lo sfondo della scheda attraverso il vetro.",
+      window_night_dim: "Scurisce il tuo colore/la tua foto quando il sole è tramontato.",
+    },
   },
 };
+
+// Taal bepalen uit HA (hass.locale), met fallback naar de browser. Noors: no/nn → nb.
+const SSC_LANG_ALIAS = { no: "nb", nn: "nb" };
+const sscLang = (hass) => {
+  let raw = hass?.locale?.language || hass?.language;
+  if (!raw) {
+    try { raw = JSON.parse(localStorage.getItem("selectedLanguage") || "null"); } catch (e) { raw = null; }
+  }
+  raw = String(raw || navigator.language || "en").toLowerCase();
+  const base = raw.split("-")[0];
+  const lang = SSC_LANG_ALIAS[base] || base;
+  return SSC_I18N[lang] ? lang : "en";
+};
+const sscT = (hass, key) => SSC_I18N[sscLang(hass)][key] ?? SSC_I18N.en[key] ?? key;
 
 const F_OPEN = 1, F_CLOSE = 2, F_SETPOS = 4, F_STOP = 8;
 
@@ -55,6 +377,9 @@ class SolarScreenCard extends HTMLElement {
   }
 
   set hass(hass) {
+    const lang = sscLang(hass);
+    if (this._lang && this._lang !== lang) this._built = false;
+    this._lang = lang;
     this._hass = hass;
     this._render();
   }
@@ -62,10 +387,7 @@ class SolarScreenCard extends HTMLElement {
   getCardSize() { return 5; }
   getGridOptions() { return { columns: 6, rows: "auto", min_columns: 4, min_rows: 4 }; }
 
-  _t(key) {
-    const lang = (this._hass?.locale?.language || this._hass?.language || "en").split("-")[0];
-    return (SSC_I18N[lang] || SSC_I18N.en)[key] || SSC_I18N.en[key] || key;
-  }
+  _t(key) { return sscT(this._hass, key); }
 
   _fmtPct(pos) {
     if (this._config.percent_mode === "closed") return `${100 - pos}${this._t("pct_closed")}`;
@@ -480,23 +802,19 @@ SolarScreenCard.styles = `
 customElements.define("solar-screen-card", SolarScreenCard);
 
 /* ---------- Visual editor ---------- */
-const SSC_LABELS = {
-  entity: "Screen (cover)", name: "Naam", icon: "Icoon", moving_entity: "Beweging-sensor (optioneel)",
-  window_azimuth: "Oriëntatie raam (°)", window_fov: "Zonhoek raam (°)", sun_entity: "Zon-entiteit",
-  percent_mode: "Percentage tonen als", presets: "Snelknoppen (positie % open)", step: "Stapgrootte slepen (%)",
-  info_entities: "Extra sensoren", show_sun: "Zon tonen",
-  background_color: "Achtergrondkleur", background_image: "Achtergrondafbeelding (upload)",
-  background_opacity: "Dekking achtergrond (%)", background_blur: "Vervaging achter kaart (px)",
-  window_background: "Wat zie je door het raam?",
-  window_color: "Kleur achter het raam", window_image: "Foto uploaden", window_image_url: "…of URL van de foto",
-  window_opacity: "Dekking raam (%)", window_night_dim: "Donkerder maken 's nachts",
-};
-
 class SolarScreenCardEditor extends HTMLElement {
   setConfig(config) { this._config = config; this._renderForm(); }
-  set hass(hass) { this._hass = hass; if (this._form) this._form.hass = hass; else this._renderForm(); }
+  set hass(hass) {
+    const langChanged = this._lang !== sscLang(hass);
+    this._hass = hass;
+    this._lang = sscLang(hass);
+    if (this._form && !langChanged) this._form.hass = hass; else this._renderForm();
+  }
+
+  _tr() { return SSC_I18N[sscLang(this._hass)]; }
 
   _schema() {
+    const t = this._tr();
     const pct = [0, 10, 20, 25, 30, 40, 50, 60, 70, 75, 80, 90, 100].map((v) => ({ value: String(v), label: `${v}%` }));
     return [
       { name: "entity", required: true, selector: { entity: { domain: "cover" } } },
@@ -508,7 +826,7 @@ class SolarScreenCardEditor extends HTMLElement {
       { name: "presets", selector: { select: { multiple: true, mode: "list", options: pct } } },
       { type: "grid", name: "", schema: [
         { name: "percent_mode", selector: { select: { mode: "dropdown", options: [
-          { value: "open", label: "% open" }, { value: "closed", label: "% dicht" }] } } },
+          { value: "open", label: t.pct_open.trim() }, { value: "closed", label: t.pct_closed.trim() }] } } },
         { name: "step", selector: { number: { min: 1, max: 25, mode: "box" } } },
       ] },
       { name: "show_sun", selector: { boolean: {} } },
@@ -517,9 +835,9 @@ class SolarScreenCardEditor extends HTMLElement {
         { name: "window_fov", selector: { number: { min: 10, max: 180, mode: "box", unit_of_measurement: "°" } } },
       ] },
       { name: "info_entities", selector: { entity: { multiple: true } } },
-      { type: "expandable", name: "", title: "Achtergrond raam", icon: "mdi:window-closed-variant", flatten: true, expanded: true,
+      { type: "expandable", name: "", title: t.sec_window, icon: "mdi:window-closed-variant", flatten: true, expanded: true,
         schema: this._windowSchema() },
-      { type: "expandable", name: "", title: "Achtergrond kaart", icon: "mdi:palette", flatten: true, schema: [
+      { type: "expandable", name: "", title: t.sec_card, icon: "mdi:palette", flatten: true, schema: [
         { name: "background_color", selector: { color_rgb: {} } },
         { name: "background_image", selector: { image: {} } },
         { name: "background_opacity", selector: { number: { min: 0, max: 100, step: 5, mode: "slider", unit_of_measurement: "%" } } },
@@ -530,12 +848,13 @@ class SolarScreenCardEditor extends HTMLElement {
 
   _windowSchema() {
     const mode = sscWindowMode(this._config || {});
+    const t = this._tr();
     const s = [
       { name: "window_background", selector: { select: { mode: "dropdown", options: [
-        { value: "sky", label: "Lucht (standaard, dag/nacht)" },
-        { value: "color", label: "Effen kleur" },
-        { value: "image", label: "Foto / afbeelding" },
-        { value: "transparent", label: "Transparant (kaartachtergrond)" },
+        { value: "sky", label: t.opt_sky },
+        { value: "color", label: t.opt_color },
+        { value: "image", label: t.opt_image },
+        { value: "transparent", label: t.opt_transparent },
       ] } } },
     ];
     if (mode === "color") s.push({ name: "window_color", selector: { color_rgb: {} } });
@@ -554,19 +873,8 @@ class SolarScreenCardEditor extends HTMLElement {
     if (!this._config || !this._hass) return;
     if (!this._form) {
       this._form = document.createElement("ha-form");
-      this._form.computeLabel = (s) => SSC_LABELS[s.name] || s.name;
-      this._form.computeHelper = (s) => ({
-        window_azimuth: "Richting waarin het raam kijkt: N=0, O=90, Z=180, W=270. Leeg = geen zon-detectie.",
-        background_opacity: "0% = volledig transparant, 100% = volledig dekkend. Geldt enkel voor de achtergrond, niet voor de inhoud.",
-        background_blur: "Vervaagt wat achter de kaart zit (handig bij een transparante kaart op een dashboard-achtergrond).",
-        background_image: "Upload een afbeelding, of zet in YAML een URL zoals /local/screen.jpg.",
-        window_background: "Kies de achtergrond achter het glas. Bij 'Effen kleur' of 'Foto' verschijnen hieronder extra velden.",
-        window_color: "Vervangt de blauwe lucht achter het glas door een effen kleur.",
-        window_image: "Bv. een foto van je echte uitzicht.",
-        window_image_url: "Alternatief voor uploaden, bv. /local/tuin.jpg. Heeft voorrang op de upload.",
-        window_opacity: "Transparantie van de lucht/het uitzicht. 0% = je ziet de kaartachtergrond door het glas.",
-        window_night_dim: "Dimt de eigen kleur/foto wanneer de zon onder is.",
-      })[s.name];
+      this._form.computeLabel = (s) => this._tr().labels[s.name] || SSC_I18N.en.labels[s.name] || s.name;
+      this._form.computeHelper = (s) => this._tr().helpers[s.name] || SSC_I18N.en.helpers[s.name];
       this._form.addEventListener("value-changed", (ev) => {
         const cfg = { ...ev.detail.value };
         if (Array.isArray(cfg.presets)) cfg.presets = cfg.presets.map(Number).sort((a, b) => b - a);
@@ -594,7 +902,7 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "solar-screen-card",
   name: "Solar Screen Card",
-  description: "Bedien je solar-screens/rolluiken met een visueel raam, sleepbediening, snelknoppen en zon-indicatie.",
+  description: sscT(null, "desc"),
   preview: true,
   documentationURL: "https://github.com/jodewee/solar-screen-card",
 });
