@@ -1,5 +1,5 @@
 /*! solar-screen-card | MIT | https://github.com/jodewee/solar-screen-card */
-const SSC_VERSION = "2026.11.13.5";
+const SSC_VERSION = "2026.11.17.1";
 
 const SSC_I18N = {
   nl: {

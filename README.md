@@ -14,15 +14,21 @@ Een Home Assistant Lovelace-kaart om solar-screens (en andere rolluiken/screens,
 
 ## Installatie
 
-### Marketplace / HACS (aangepaste repository)
-1. Open **Instellingen → Marketplace** (of HACS op oudere versies) → **Toevoegen via link / Custom repositories**.
+### Marketplace / HACS (aanbevolen)
+1. Open **Instellingen → Marketplace** (of HACS op oudere versies).
+2. Zoek naar **Solar Screen Card**.
+3. Installeer de kaart en herlaad de browser.
+
+### Marketplace / HACS: aangepaste repository (fallback)
+Vind je de kaart niet via zoeken (bv. omdat ze nog niet in de catalogus staat)? Voeg de repository dan zelf toe:
+1. Open **Instellingen → Marketplace** (of HACS) → **Toevoegen via link / Custom repositories**.
 2. Voeg `https://github.com/jodewee/solar-screen-card` toe als type **Dashboard / Lovelace**.
 3. Installeer **Solar Screen Card** en herlaad de browser.
 
 ### Handmatig
 1. Kopieer `solar-screen-card.js` naar `/config/www/`.
 2. Voeg een resource toe (**Instellingen → Dashboards → ⋮ → Resources**):
-   `/local/solar-screen-card.js?v=2026.11.13.5`, type **JavaScript module**.
+   `/local/solar-screen-card.js?v=2026.11.17.1`, type **JavaScript module**.
 
 ## Configuratie
 
